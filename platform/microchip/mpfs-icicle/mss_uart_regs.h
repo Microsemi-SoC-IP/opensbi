@@ -1,5 +1,5 @@
  /*******************************************************************************
- * (c) Copyright 2018 Microsemi-PRO Embedded Systems Solutions.  All rights reserved.
+ * (c) Copyright 2019 Microsemi-PRO Embedded Systems Solutions.  All rights reserved.
  * 
  * Register bit offsets and masks definitions for PolarFire SoC(PSE) MSS MMUART.
  * 

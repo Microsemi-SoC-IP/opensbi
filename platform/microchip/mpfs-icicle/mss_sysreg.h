@@ -1,11 +1,9 @@
 /***************************************************************************
- * (c) Copyright 2007-2018 Microsemi SoC Products Group. All rights reserved.
+ * (c) Copyright 2007-2019 Microsemi SoC Products Group. All rights reserved.
  * 
  * Hardware register definitions.
  * updated sysreg defines Based on SVN rev 100432 of g5_mss_top_sysreg.xls
  * 
- * SVN $Revision: 9661 $
- * SVN $Date: 2018-01-15 10:43:33 +0000 (Mon, 15 Jan 2018) $
  */
 #ifndef MSS_SYSREG_H
 #define MSS_SYSREG_H

@@ -75,19 +75,6 @@ static int mpfs_pmp_region_info(u32 hartid, u32 index,
 
 static int mpfs_console_init(void)
 {
-#if 0
-	unsigned long peri_in_freq;
-
-	if (readl((volatile void *)MPFS_PRCI_BASE_ADDR +
-		  MPFS_PRCI_CLKMUXSTATUSREG) &
-		  MPFS_PRCI_CLKMUX_STATUS_TLCLKSEL) {
-		peri_in_freq = MPFS_SYS_CLK;
-	} else {
-		peri_in_freq = MPFS_SYS_CLK / 2;
-	}
-
-#endif
-
 	MSS_UART_init(g_uart, MPFS_UART_BAUDRATE,
 	        MSS_UART_DATA_8_BITS | MSS_UART_NO_PARITY | MSS_UART_ONE_STOP_BIT,
 	        MSS_UART0_INTR_LOCAL);
@@ -176,9 +163,7 @@ struct sbi_platform platform = {
 	.disabled_hart_mask = MPFS_HARITD_DISABLED,
 	.pmp_region_count = mpfs_pmp_region_count,
 	.pmp_region_info = mpfs_pmp_region_info,
-
 	.console_putc = mpfs_uart_putc,
-	.console_getc = mpfs_uart_getc,
 	.console_init = mpfs_console_init,
 	.irqchip_init = mpfs_irqchip_init,
 	.ipi_send = clint_ipi_send,

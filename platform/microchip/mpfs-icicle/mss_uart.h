@@ -1,13 +1,11 @@
 /*******************************************************************************
- * (c) Copyright 2018 Microsemi SoC Products Group.  All rights reserved.
+ * (c) Copyright 2019 Microsemi SoC Products Group.  All rights reserved.
  *
  * PolarFore SoC (PSE) Microcontroller Subsystem MMUART bare metal software
  * driver public API.
  *
  * This driver is based on SmartFusion2 MMUART driver v2.1.100
  *
- * SVN $Revision: 10070 $
- * SVN $Date: 2018-05-30 19:59:59 +0530 (Wed, 30 May 2018) $
  */
 /*=========================================================================*//**
   @mainpage PSE MSS UART Bare Metal Driver.

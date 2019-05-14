@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2018 Microsemi SoC Products Group.  All rights reserved.
+ * (c) Copyright 2019 Microsemi SoC Products Group.  All rights reserved.
  *
  * PolarFire SoC(PSE) Microcontroller Subsystem MMUART bare metal software driver
  * implementation.
@@ -476,81 +476,7 @@ MSS_UART_polled_tx
 	}
 }
 
-/***************************************************************************//**
- * See mss_uart.h for details of how to use this function.
- */
-void
-MSS_UART_polled_tx_string
-(
-    mss_uart_instance_t * this_uart,
-    const uint8_t * p_sz_string
-)
-{
-    uint32_t char_idx = 0u;
-    uint32_t fill_size;
-    uint8_t data_byte;
-    uint8_t status;
 
-    ASSERT(p_sz_string != ((uint8_t *)0));
-
-    if(p_sz_string != ((uint8_t *)0))
-    {
-        /* Get the first data byte from the input buffer */
-        data_byte = p_sz_string[char_idx];
-
-        /* First check for the NULL terminator byte.
-         * Then remain in this loop until the entire string in the input buffer
-         * has been transferred to the UART.
-         */
-        while(0u != data_byte)
-        {
-            /* Wait until TX FIFO is empty. */
-            do {
-                status = this_uart->hw_reg->LSR;
-                this_uart->status |= status;
-            } while (0u == (status & MSS_UART_THRE));
-
-            /* Send bytes from the input buffer until the TX FIFO is full
-             * or we reach the NULL terminator byte.
-             */
-            fill_size = 0u;
-            while((0u != data_byte) && (fill_size < TX_FIFO_SIZE))
-            {
-                /* Send the data byte */
-                this_uart->hw_reg->THR = data_byte;
-                ++fill_size;
-                char_idx++;
-                /* Get the next data byte from the input buffer */
-                data_byte = p_sz_string[char_idx];
-            }
-        }
-    }
-}
-
-/***************************************************************************//**
- * See mss_uart.h for details of how to use this function.
- */
-int8_t
-MSS_UART_tx_complete
-(
-    mss_uart_instance_t * this_uart
-)
-{
-    int8_t ret_value = 0;
-    uint8_t status = 0u;
-
-    /* Read the Line Status Register and update the sticky record. */
-    status = this_uart->hw_reg->LSR;
-    this_uart->status |= status;
-
-    if((TX_COMPLETE == this_uart->tx_buff_size) &&
-       ((status & MSS_UART_TEMT) != 0u))
-    {
-        ret_value = (int8_t)1;
-    }
-
-    return ret_value;
-}
 
 /***************************************************************************//**
  * See mss_uart.h for details of how to use this function.
@@ -586,129 +512,8 @@ MSS_UART_get_rx
     return rx_size;
 }
 
-/***************************************************************************//**
- * See mss_uart.h for details of how to use this function.
- */
-size_t
-MSS_UART_fill_tx_fifo
-(
-    mss_uart_instance_t * this_uart,
-    const uint8_t * tx_buffer,
-    size_t tx_size
-)
-{
-    uint8_t status = 0u;
-    size_t size_sent = 0u;
 
-    ASSERT(tx_buffer != ( (uint8_t *)0));
-    ASSERT(tx_size > 0);
 
-    /* Fill the UART's Tx FIFO until the FIFO is full or the complete input
-     * buffer has been written. */
-    if((tx_buffer != ((uint8_t *)0))   &&
-       (tx_size > 0u))
-    {
-        status = this_uart->hw_reg->LSR;
-        this_uart->status |= status;
-
-        if(status & MSS_UART_THRE)
-        {
-            uint32_t fill_size = TX_FIFO_SIZE;
-
-            if(tx_size < TX_FIFO_SIZE)
-            {
-                fill_size = tx_size;
-            }
-            /* Fill up FIFO */
-            for(size_sent = 0u; size_sent < fill_size; ++size_sent)
-            {
-
-                /* Send next character in the buffer. */
-                this_uart->hw_reg->THR = tx_buffer[size_sent];
-            }
-        }
-    }
-    return size_sent;
-}
-
-/***************************************************************************//**
- * See mss_uart.h for details of how to use this function.
- */
-uint8_t
-MSS_UART_get_rx_status
-(
-    mss_uart_instance_t * this_uart
-)
-{
-    uint8_t status = MSS_UART_INVALID_PARAM;
-
-    /*
-     * Extract UART receive error status.
-     * Bit 1 - Overflow error status
-     * Bit 2 - Parity error status
-     * Bit 3 - Frame error status
-     * Bit 4 - Break interrupt indicator
-     * Bit 7 - FIFO data error status
-     */
-    this_uart->status |= (this_uart->hw_reg->LSR);
-    status = (this_uart->status & STATUS_ERROR_MASK);
-    /* Clear the sticky status after reading */
-    this_uart->status = 0u;
-
-    return status;
-}
-
-/***************************************************************************//**
- * See mss_uart.h for details of how to use this function.
- */
-uint8_t
-MSS_UART_get_modem_status
-(
-    mss_uart_instance_t * this_uart
-)
-{
-    uint8_t status = MSS_UART_INVALID_PARAM;
-
-    /*
-     * Extract UART modem status and place in lower bits of "status".
-     * Bit 0 - Delta Clear to Send Indicator
-     * Bit 1 - Delta Clear to Receive Indicator
-     * Bit 2 - Trailing edge of Ring Indicator detector
-     * Bit 3 - Delta Data Carrier Detect indicator
-     * Bit 4 - Clear To Send
-     * Bit 5 - Data Set Ready
-     * Bit 6 - Ring Indicator
-     * Bit 7 - Data Carrier Detect
-     */
-    status = this_uart->hw_reg->MSR;
-
-    return status;
-}
-
-/***************************************************************************//**
- * MSS_UART_get_tx_status.
- * See mss_uart.h for details of how to use this function.
- */
-uint8_t
-MSS_UART_get_tx_status
-(
-    mss_uart_instance_t * this_uart
-)
-{
-    uint8_t status = MSS_UART_TX_BUSY;
-
-    /* Read the Line Status Register and update the sticky record. */
-    status = this_uart->hw_reg->LSR;
-    this_uart->status |= status;
-    /*
-     * Extract the transmit status bits from the UART's Line Status Register.
-     * Bit 5 - Transmitter Holding Register/FIFO Empty (THRE) status. (If = 1, TX FIFO is empty)
-     * Bit 6 - Transmitter Empty (TEMT) status. (If = 1, both TX FIFO and shift register are empty)
-     */
-    status &= (MSS_UART_THRE | MSS_UART_TEMT);
-
-    return status;
-}
 
 #ifdef __cplusplus
 }
