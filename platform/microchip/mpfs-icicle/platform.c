@@ -84,7 +84,7 @@ static int mpfs_console_init(void)
 	return 0;
 }
 
-int mpfs_uart_getc(void)
+static char mpfs_uart_getc(void)
 {
 	size_t bufsize = 0;
 	uint8_t bufchar = 0;
@@ -93,10 +93,10 @@ int mpfs_uart_getc(void)
 	if(bufsize != 1)
 		bufchar = 0;
 
-	return (int)bufchar;
+	return (char)bufchar;
 }
 
-void mpfs_uart_putc(char ch)
+static void mpfs_uart_putc(char ch)
 {
 	MSS_UART_polled_tx(g_uart,(const uint8_t *)&ch, 1);
 }
